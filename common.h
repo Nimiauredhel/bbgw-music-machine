@@ -1,5 +1,10 @@
-#include "stdlib.h"
-#include "stdint.h"
+#include <stdlib.h>
+#include <stdint.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <signal.h>
 
 #ifndef COMMON_H
 #define COMMON_H
@@ -69,5 +74,11 @@ typedef struct composition_t
     const uint16_t initialRhythmUnit;
     const sequence_t sequences[];
 } composition_t;
+
+extern bool should_terminate;
+
+void initialize_signal_handler(void);
+void signal_handler(int signum);
+int random_range(int min, int max);
 
 #endif // COMMON_H

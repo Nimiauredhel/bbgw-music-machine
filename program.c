@@ -32,7 +32,9 @@ const instrument instruments[] =
 
 int main(void)
 {
+    initialize_signal_handler();
     system("sh setup.sh");
+
     // initialize data
     state_t *state = initializeState(&composition);
 
@@ -40,12 +42,14 @@ int main(void)
     sleep(1);
 
     // let's gooo
-    for(;;)
+    while(!should_terminate)
     {
         readTracks(state);
         playChannels(state);
 	delay_ms(sleepUnit);
     }
+
+    printf("Terminated by user.\n");
 
     return 0;
 }
