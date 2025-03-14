@@ -24,7 +24,7 @@ static int get_fd(const char *path);
 static void write_fd(int fd, const uint64_t value);
 static void delay_ms (uint16_t ms);
 
-static const uint16_t sleepUnit = 256;
+static const uint16_t sleepUnit = 512;
 
 const instrument instruments[] =
 {

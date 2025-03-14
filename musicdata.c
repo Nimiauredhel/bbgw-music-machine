@@ -5,7 +5,7 @@
 uint64_t voiceOne[] =
 {
     INSTRUMENT(SQUARE)
-        TEMPO(56)
+        TEMPO(32)
     NOTE(G4, 48, 8)
     NOTE(F4, 42, 4) SILENCE(4)
     //
@@ -151,7 +151,7 @@ uint64_t voiceOne[] =
 uint64_t voiceTwo[] =
 {
     INSTRUMENT(SQUARE)
-        TEMPO(56)
+        TEMPO(32)
     NOTE(B1, 24, 4) SILENCE(4)
     JUMPBACK(7)
     //
@@ -266,7 +266,7 @@ uint64_t voiceTwo[] =
 uint64_t voiceThree[] =
 {
     INSTRUMENT(SQUARE)
-        TEMPO(56)
+        TEMPO(32)
     NOTE(D4, 16, 8)
     NOTE(D4, 24, 4) SILENCE(4)
     //
@@ -363,7 +363,7 @@ uint64_t voiceThree[] =
 uint64_t voiceFour[] =
 {
     INSTRUMENT(SQUARE)
-        TEMPO(56)
+        TEMPO(32)
     NOTE(B0, 24, 4) SILENCE(4)
     JUMPBACK(7)
     //
@@ -478,7 +478,7 @@ uint64_t voiceFour[] =
 const composition_t composition =
 {
     .numSequences = 4,
-    .initialRhythmUnit = 56,
+    .initialRhythmUnit = 32,
     .sequences =
     {
         {
