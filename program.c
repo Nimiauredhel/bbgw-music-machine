@@ -20,10 +20,11 @@ static void readTracks(state_t *state);
 static void playChannels(state_t *state);
 static void instSilence(channel_t *channel, state_t *state);
 static void instRegular(channel_t *channel, state_t *state);
-static void write_file(const char *path, const uint32_t value);
+static int get_fd(const char *path);
+static void write_fd(int fd, const uint64_t value);
 static void delay_ms (uint16_t ms);
 
-static const uint16_t sleepUnit = 1;
+static const uint16_t sleepUnit = 256;
 
 const instrument instruments[] =
 {
@@ -32,6 +33,7 @@ const instrument instruments[] =
 
 int main(void)
 {
+    uint32_t counter = 0;
     initialize_signal_handler();
     system("sh setup.sh");
 
@@ -44,9 +46,12 @@ int main(void)
     // let's gooo
     while(!should_terminate)
     {
+        printf("\r%lu", counter);
+	fflush(stdout);
+	counter++;
         readTracks(state);
         playChannels(state);
-	delay_ms(sleepUnit);
+	usleep(sleepUnit);
     }
 
     printf("Terminated by user.\n");
@@ -56,19 +61,29 @@ int main(void)
 
 static void initializeChannel(channel_t *channel, const char *device_path)
 {
-    sprintf(channel->enable_path, "%s/enable", device_path);
-    sprintf(channel->period_path, "%s/period", device_path);
-    sprintf(channel->duty_path, "%s/duty_cycle", device_path);
+    char path[32];
+
+    sprintf(path, "%s/enable", device_path);
+    channel->enable_fd = get_fd(path);
+
+    sprintf(path, "%s/period", device_path);
+    channel->period_fd = get_fd(path);
+
+    sprintf(path, "%s/duty_cycle", device_path);
+    channel->duty_fd = get_fd(path);
+
     channel->currentTone = 0;
-    write_file(channel->duty_path, 0);
-    write_file(channel->enable_path, 1);
+    write_fd(channel->duty_fd, 0);
+    write_fd(channel->enable_fd, 1);
+
     for(int i = 0; i < 4; i++)
     {
         channel->currentPitches[i] = 255;
     }
+
     channel->currentPitchCount = 0;
     channel->nextPitchIndex = 0;
-    channel->polyCycleThreshold = 2;
+    channel->polyCycleThreshold = 24;
     channel->polyCycleCounter = 0;
     channel->instrument = instruments[0];
 }
@@ -78,9 +93,9 @@ static channel_t* initializeChannels(uint8_t numChannels)
     static const char device_paths[4][32] =
     {
 	"/dev/bone/pwm/0/a/",
-	"/dev/bone/pwm/0/b/",
 	"/dev/bone/pwm/1/a/",
-	"/dev/bone/pwm/1/b/",
+	"/dev/bone/pwm/2/a/",
+	"/dev/bone/ecap/0/",
     };
 
     channel_t *channels = malloc((numChannels) * sizeof(channel_t));
@@ -127,7 +142,7 @@ static state_t* initializeState(const composition_t *pComposition)
     // giving up on ADC volume for now -
     // clearly not as straightforward as it was in the atmega,
     // and it wasn't the right way anyway
-    state->volume = 512.0;
+    state->volume = 0.25;
 
     return state;
 }
@@ -146,7 +161,7 @@ static void readTrack(track_t *target, uint16_t *rhythmUnit)
         return;
     }
 
-    const uint32_t *tSequence = target->sequence;
+    const uint64_t *tSequence = target->sequence;
     uint16_t position = target->sPosition;
     uint8_t code = tSequence[position];
     channel_t *tChannel = target->channel;
@@ -289,10 +304,10 @@ static void instRegular(channel_t *channel, state_t *state)
         channel->nextPitchIndex = 0;
     }
 
-    uint32_t pitch = channel->currentPitches[channel->nextPitchIndex];
-    write_file(channel->period_path, pitch);
-    uint32_t finalTone = (channel->currentTone)*(state->volume);
-    write_file(channel->duty_path, finalTone);
+    uint64_t pitch = channel->currentPitches[channel->nextPitchIndex];
+    write_fd(channel->period_fd, pitch);
+    uint64_t finalTone = pitch*(channel->currentTone/64.0)*(state->volume);
+    write_fd(channel->duty_fd, finalTone);
 
     channel->polyCycleCounter++;
 
@@ -310,9 +325,8 @@ static void instRegular(channel_t *channel, state_t *state)
     }
 }
 
-static void write_file(const char *path, const uint32_t value)
+static int get_fd(const char *path)
 {
-    char value_str[32] = {0};
     int fd = open(path, O_RDWR, S_IWUSR);
 
     if (fd == -1)
@@ -321,11 +335,14 @@ static void write_file(const char *path, const uint32_t value)
             exit(1);
     }
 
+    return fd;
+}
+
+static void write_fd(int fd, const uint64_t value)
+{
+    char value_str[32] = {0};
     sprintf(value_str, "%lu", value);
-
     write(fd, value_str, strlen(value_str));
-
-    close(fd);
 }
 
 static void delay_ms (uint16_t ms)

@@ -1,7 +1,7 @@
 #ifndef NOTATION_DEFINES_H
 #define NOTATION_DEFINES_H
 
-#include "stdint.h"
+#include <stdint.h>
 #include "pitches.h"
 // sequence encoding:
 // first element: music event type (also implying length)

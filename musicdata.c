@@ -2,10 +2,10 @@
 
 #include "notationdefines.h"
 
-uint32_t voiceOne[] =
+uint64_t voiceOne[] =
 {
     INSTRUMENT(SQUARE)
-        TEMPO(16)
+        TEMPO(56)
     NOTE(G4, 48, 8)
     NOTE(F4, 42, 4) SILENCE(4)
     //
@@ -148,10 +148,10 @@ uint32_t voiceOne[] =
     JUMPBACK(7)
 };
 
-uint32_t voiceTwo[] =
+uint64_t voiceTwo[] =
 {
     INSTRUMENT(SQUARE)
-        TEMPO(16)
+        TEMPO(56)
     NOTE(B1, 24, 4) SILENCE(4)
     JUMPBACK(7)
     //
@@ -263,10 +263,10 @@ uint32_t voiceTwo[] =
     JUMPBACK(7)
 };
 
-uint32_t voiceThree[] =
+uint64_t voiceThree[] =
 {
     INSTRUMENT(SQUARE)
-        TEMPO(16)
+        TEMPO(56)
     NOTE(D4, 16, 8)
     NOTE(D4, 24, 4) SILENCE(4)
     //
@@ -360,10 +360,10 @@ uint32_t voiceThree[] =
     NOTE4(G3, B3, D4, G4, 14, 32)
 };
 
-uint32_t voiceFour[] =
+uint64_t voiceFour[] =
 {
     INSTRUMENT(SQUARE)
-        TEMPO(16)
+        TEMPO(56)
     NOTE(B0, 24, 4) SILENCE(4)
     JUMPBACK(7)
     //
@@ -478,7 +478,7 @@ uint32_t voiceFour[] =
 const composition_t composition =
 {
     .numSequences = 4,
-    .initialRhythmUnit = 16,
+    .initialRhythmUnit = 56,
     .sequences =
     {
         {

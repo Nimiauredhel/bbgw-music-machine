@@ -19,17 +19,17 @@ typedef void(*instrument)(channel_t *channel, state_t *state);
 typedef struct channel_t
 {
     // paths to linux device files
-    char enable_path[32];
-    char period_path[32];
-    char duty_path[32];
+    int enable_fd;
+    int period_fd;
+    int duty_fd;
     // the number of pitches represented by this channel
     uint8_t currentPitchCount;
     // array of pitches represented by this channel
-    uint32_t currentPitches[4];
+    uint64_t currentPitches[4];
     // index of next pitch to sound on this channel
     uint8_t nextPitchIndex;
     // current "tone" (voltage?) set on this channel
-    uint32_t currentTone;
+    uint64_t currentTone;
     uint16_t polyCycleThreshold;
     uint16_t polyCycleCounter;
     // the "instrument" function assigned to this channel, controlling the waveform etc.
@@ -41,7 +41,7 @@ typedef struct track_t
     // target channel associated with this track
     channel_t *channel;
     // the sequence of commands associated with this track
-    const uint32_t *sequence;
+    const uint64_t *sequence;
     // the length of the command sequence
     uint16_t sLength;
     // the current position of the command sequence
@@ -65,7 +65,7 @@ typedef struct state_t
 typedef struct sequence_t
 {
     const uint16_t sequenceLength;
-    const uint32_t *sequence;
+    const uint64_t *sequence;
 } sequence_t;
 
 typedef struct composition_t
@@ -79,6 +79,5 @@ extern bool should_terminate;
 
 void initialize_signal_handler(void);
 void signal_handler(int signum);
-int random_range(int min, int max);
 
 #endif // COMMON_H
